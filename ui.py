@@ -2,6 +2,7 @@ import uuid
 import numpy as np
 import streamlit as st
 import itertools
+import gamspy as gp
 from problem import main, ProblemInput
 from functools import partial
 
@@ -192,36 +193,42 @@ if st.button("Solve"):
     problem = detect_structure(values)
     problem.letters = letters_selected
 
-    result, summary = main(problem)
+    try:
+        result, summary = main(problem)
+    except gp.exceptions.GamspyException as e:
+        if "license error" in str(e):
+            st.write("License Error!")
+        else:
+            raise e
+    else:
+        new_solution = {}
+        for index, word in summary:
+            index = int(index)
+            block = problem.blocks[index - 1]
+            letter_index = 0
+            for ih in range(block[0][0], block[1][0] + 1):
+                for iw in range(block[0][1], block[1][1] + 1):
+                    l = word[letter_index]
+                    letter_index += 1
+                    new_solution[(ih, iw)] = l
 
-    new_solution = {}
-    for index, word in summary:
-        index = int(index)
-        block = problem.blocks[index - 1]
-        letter_index = 0
-        for ih in range(block[0][0], block[1][0] + 1):
-            for iw in range(block[0][1], block[1][1] + 1):
-                l = word[letter_index]
-                letter_index += 1
-                new_solution[(ih, iw)] = l
+        st.session_state["solution"] = new_solution
 
-    st.session_state["solution"] = new_solution
+        st.write(result)
 
-    st.write(result)
+        for row in range(row_count):
+            cols = st.columns(10)
+            for i, col in enumerate(cols):
+                with col:
+                    color = "primary" if st.session_state[(row, i)] else "secondary"
+                    label = " "
+                    if (row, i) in st.session_state["solution"]:
+                        label = st.session_state["solution"][(row, i)]
 
-    for row in range(row_count):
-        cols = st.columns(10)
-        for i, col in enumerate(cols):
-            with col:
-                color = "primary" if st.session_state[(row, i)] else "secondary"
-                label = " "
-                if (row, i) in st.session_state["solution"]:
-                    label = st.session_state["solution"][(row, i)]
-
-                st.button(
-                    key=f"sol_{row}x{i}",
-                    label=label,
-                    type=color,
-                    use_container_width=True,
-                    disabled=True,
-                )
+                    st.button(
+                        key=f"sol_{row}x{i}",
+                        label=label,
+                        type=color,
+                        use_container_width=True,
+                        disabled=True,
+                    )
