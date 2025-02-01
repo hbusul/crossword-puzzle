@@ -27,6 +27,7 @@ def main(problem: ProblemInput):
 
     vocabulary = []
 
+    block_len_set = set(problem.block_lens)
     with open("american-english", "r") as f:
         for line in f:
             line = line.strip()
@@ -38,6 +39,9 @@ def main(problem: ProblemInput):
                 continue
 
             if line.endswith("'s"):
+                continue
+
+            if len(line) not in block_len_set:
                 continue
 
             if set(line) <= letters:
