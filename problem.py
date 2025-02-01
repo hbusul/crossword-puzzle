@@ -118,12 +118,12 @@ def main(problem: ProblemInput):
     big_M = 3
     # use common letters
     eq3_1 = gp.Equation(m, domain=[j, jj, i, ii, l, k, kk])
-    eq3_1[j, jj, i, ii, l, k, kk].where[common[j, jj, i, ii]] = (
+    eq3_1[j, jj, i, ii, l, k, kk].where[common[j, jj, i, ii] & (wlet[k, i, l])] = (
         wlet[k, i, l] + (2 - w[j, k] - w[jj, kk]) * big_M >= wlet[kk, ii, l]
     )
 
     eq3_2 = gp.Equation(m, domain=[j, jj, i, ii, l, k, kk])
-    eq3_2[j, jj, i, ii, l, k, kk].where[common[j, jj, i, ii]] = (
+    eq3_2[j, jj, i, ii, l, k, kk].where[common[j, jj, i, ii] & (wlet[k, i, l])] = (
         wlet[k, i, l] <= wlet[kk, ii, l] + (2 - w[j, k] - w[jj, kk]) * big_M
     )
 
