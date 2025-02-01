@@ -92,6 +92,7 @@ def main(problem: ProblemInput):
 
     wlet = gp.Parameter(m, name="wlet", domain=[k, i, l])
 
+    print(len(vocabulary))
     for word in vocabulary:
         for ind, cha in enumerate(word):
             wlet[word, str(ind + 1), cha] = 1
@@ -116,16 +117,22 @@ def main(problem: ProblemInput):
     eq2[k] = gp.Sum(j, w[j, k]) <= 1
 
     big_M = 3
-    # use common letters
-    eq3_1 = gp.Equation(m, domain=[j, jj, i, ii, l, k, kk])
-    eq3_1[j, jj, i, ii, l, k, kk].where[common[j, jj, i, ii] & (wlet[k, i, l])] = (
-        wlet[k, i, l] + (2 - w[j, k] - w[jj, kk]) * big_M >= wlet[kk, ii, l]
-    )
 
-    eq3_2 = gp.Equation(m, domain=[j, jj, i, ii, l, k, kk])
-    eq3_2[j, jj, i, ii, l, k, kk].where[common[j, jj, i, ii] & (wlet[k, i, l])] = (
-        wlet[k, i, l] <= wlet[kk, ii, l] + (2 - w[j, k] - w[jj, kk]) * big_M
-    )
+    # use common letters
+    eq4 = gp.Equation(m, domain=[j, jj, i, ii, l])
+    eq4[j, jj, i, ii, l].where[
+        common[j, jj, i, ii]
+    ] = gp.Sum(k.where[wlet[k, i, l]], w[j, k]) == gp.Sum(k.where[wlet[k, ii, l]], w[jj, k])
+
+    #eq3_1 = gp.Equation(m, domain=[j, jj, i, ii, l, k, kk])
+    #eq3_1[j, jj, i, ii, l, k, kk].where[common[j, jj, i, ii] & (wlet[k, i, l])] = (
+        #wlet[k, i, l] + (2 - w[j, k] - w[jj, kk]) * big_M >= wlet[kk, ii, l]
+    #)
+#
+    #eq3_2 = gp.Equation(m, domain=[j, jj, i, ii, l, k, kk])
+    #eq3_2[j, jj, i, ii, l, k, kk].where[common[j, jj, i, ii] & (wlet[k, i, l])] = (
+        #wlet[k, i, l] <= wlet[kk, ii, l] + (2 - w[j, k] - w[jj, kk]) * big_M
+    #)
 
     model = gp.Model(
         m,
