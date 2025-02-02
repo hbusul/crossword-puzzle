@@ -231,6 +231,25 @@ if st.button("Solve"):
 
         st.write(result)
 
+        st.markdown("""
+            <style>.element-container:has(#button-after) + div button {
+                color: black;
+                background-color: rgb(255, 75, 75);
+                    }
+                    #button-after {
+                        display: none;
+                    }
+                    #disabled-after {
+                        display: none;
+                    }
+                    .element-container:has(#button-after) {
+                    display: none;
+                    }
+                    .element-container:has(#disabled-after) {
+                    display: none;
+                    }
+                    </style>""", unsafe_allow_html=True)
+
         for row in range(row_count):
             cols = st.columns(10)
             for i, col in enumerate(cols):
@@ -239,6 +258,9 @@ if st.button("Solve"):
                     label = " "
                     if (row, i) in st.session_state["solution"]:
                         label = st.session_state["solution"][(row, i)]
+                        st.markdown('<span id="button-after"></span>', unsafe_allow_html=True)
+                    else:
+                        st.markdown('<span id="disabled-after"></span>', unsafe_allow_html=True)
 
                     st.button(
                         key=f"sol_{row}x{i}",
