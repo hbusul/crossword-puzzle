@@ -81,6 +81,10 @@ def detect_structure(values: np.ndarray) -> ProblemInput:
     h_blocks = get_block_horizontal(values)
     v_blocks = get_block_vertical(values)
     blocks = [*h_blocks, *v_blocks]
+
+    if len(blocks) == 0:
+        raise Exception("Please select some blocks, and blocks with size 1 do not count")
+
     num_blocks = len(blocks)
 
     block_lens = [get_block_len(x) for x in blocks]
@@ -189,6 +193,9 @@ if st.button("Solve"):
         values.append(temp)
 
     values = np.array(values)
+
+    if len(letters_selected) == 0:
+        raise Exception("You did not select any letters!")
 
     problem = detect_structure(values)
     problem.letters = letters_selected

@@ -47,6 +47,11 @@ def main(problem: ProblemInput):
             if set(line) <= letters:
                 vocabulary.append(line)
 
+    if len(vocabulary) == 0:
+        raise Exception(
+            "Letters you picked combined with the blocks does not match any words in the dictionary"
+        )
+
     letters = list(letters)
 
     m = gp.Container()
@@ -64,6 +69,9 @@ def main(problem: ProblemInput):
 
     ii = gp.Alias(m, "ii", alias_with=i)
     jj = gp.Alias(m, "jj", alias_with=j)
+
+    if len(matches) == 0:
+        matches = None
 
     common = gp.Set(
         m,
@@ -123,20 +131,13 @@ def main(problem: ProblemInput):
     big_M = 3
 
     # use common letters
-    eq4 = gp.Equation(m, domain=[j, jj, i, ii, l])
-    eq4[j, jj, i, ii, l].where[
+    eq3 = gp.Equation(m, domain=[j, jj, i, ii, l])
+    eq3[j, jj, i, ii, l].where[
         common[j, jj, i, ii]
-    ] = gp.Sum(k.where[wlet[k, i, l]], w[j, k]) == gp.Sum(k.where[wlet[k, ii, l]], w[jj, k])
-
-    #eq3_1 = gp.Equation(m, domain=[j, jj, i, ii, l, k, kk])
-    #eq3_1[j, jj, i, ii, l, k, kk].where[common[j, jj, i, ii] & (wlet[k, i, l])] = (
-        #wlet[k, i, l] + (2 - w[j, k] - w[jj, kk]) * big_M >= wlet[kk, ii, l]
-    #)
-#
-    #eq3_2 = gp.Equation(m, domain=[j, jj, i, ii, l, k, kk])
-    #eq3_2[j, jj, i, ii, l, k, kk].where[common[j, jj, i, ii] & (wlet[k, i, l])] = (
-        #wlet[k, i, l] <= wlet[kk, ii, l] + (2 - w[j, k] - w[jj, kk]) * big_M
-    #)
+    ] = (
+        gp.Sum(k.where[wlet[k, i, l]], w[j, k]) ==
+        gp.Sum(k.where[wlet[k, ii, l]], w[jj, k])
+    )
 
     model = gp.Model(
         m,
