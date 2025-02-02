@@ -1,10 +1,10 @@
-import uuid
+from functools import partial
+
+import gamspy as gp
 import numpy as np
 import streamlit as st
-import itertools
-import gamspy as gp
+
 from problem import main, ProblemInput
-from functools import partial
 
 
 coords = tuple[int, int]
@@ -83,7 +83,9 @@ def detect_structure(values: np.ndarray) -> ProblemInput:
     blocks = [*h_blocks, *v_blocks]
 
     if len(blocks) == 0:
-        raise Exception("Please select some blocks, and blocks with size 1 do not count")
+        e = Exception("Please select some blocks, and blocks with size 1 do not count")
+        st.exception(e)
+        raise e
 
     num_blocks = len(blocks)
 
@@ -195,7 +197,9 @@ if st.button("Solve"):
     values = np.array(values)
 
     if len(letters_selected) == 0:
-        raise Exception("You did not select any letters!")
+        e = Exception("You did not select any letters!")
+        st.exception(e)
+        raise e
 
     problem = detect_structure(values)
     problem.letters = letters_selected
@@ -206,7 +210,11 @@ if st.button("Solve"):
         if "license error" in str(e):
             st.write("License Error!")
         else:
+            st.exception(e)
             raise e
+    except Exception as e:
+        st.exception(e)
+        raise e
     else:
         new_solution = {}
         for index, word in summary:
