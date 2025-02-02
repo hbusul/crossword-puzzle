@@ -28,7 +28,7 @@ def main(problem: ProblemInput):
     vocabulary = []
 
     block_len_set = set(problem.block_lens)
-    with open("american-english", "r") as f:
+    with open("filtered_words.txt", "r") as f:
         for line in f:
             line = line.strip()
 
@@ -146,6 +146,8 @@ def main(problem: ProblemInput):
     )
 
     result = model.solve(output=sys.stdout)
+    if "IntegerInfeasible" in str(result):
+        raise Exception("Problem is infeasible, no solution found!")
 
     data = w.records
     data = data[data["level"] == 1]
